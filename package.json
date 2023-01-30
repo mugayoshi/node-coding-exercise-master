@@ -1,0 +1,14 @@
+{
+  "name": "coding-exercise-master",
+  "version": "1.0.0",
+  "description": "coding-exercise",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "muga",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.4.1"
+  }
+}
