@@ -10,9 +10,9 @@ const outputPath = path.resolve(__dirname, "clean_application.json");
 fs.writeFileSync(outputPath, Buffer.from(JSON.stringify(output)));
 
 /**
- * iterates through the input object and removes the duplicated properties in it
- * @param {Object} obj
- * @param {Map} map
+ * 
+ * @param {object} obj 
+ * @param {Map<number, object[]>} map 
  * @returns void
  */
 function iterateObjectToRemoveDuplicates(obj, map) {
@@ -20,37 +20,45 @@ function iterateObjectToRemoveDuplicates(obj, map) {
     return;
   }
   const keys = Object.keys(obj);
-  keys.forEach((key) => {
+  for (const key of keys) {
     const val = obj[key];
-    if (typeof val === "object") {
-      iterateObjectToRemoveDuplicates(val, map);
+    if (typeof val !== 'object') {
+      continue;
     }
-    if (!map.has(key)) {
-      map.set(key, [val]);
-      return;
+    if (!val) {
+      continue;
     }
-    const objectsArr = map.get(key);
+    const keysChildrenObjs = Object.keys(val);
+    const targetObjs = map.get(keysChildrenObjs.length);
     let isMatch = false;
-    for (const o of objectsArr) {
-      if (o === val) {
-        delete obj[key];
-        isMatch = true;
+    if (targetObjs && targetObjs.length)  {
+
+      for (const targetObj of targetObjs) {
+        if (targetObj === val) {
+          delete obj[key];
+          isMatch = true;
+          break;
+        }
       }
     }
     if (!isMatch) {
-      map.set(key, [...objectsArr, val]);
+      if (targetObjs) {
+        map.set(keysChildrenObjs.length, [...targetObjs, val]);
+      } else {
+        map.set(keysChildrenObjs.length, [val]);
+      }
     }
-  });
-  return;
+    
+    iterateObjectToRemoveDuplicates(val, map);
+  }
 }
-
 /**
  *
  * @param {Object} inputJson
  * @returns {Object} obj
  */
 function removeDuplicates(inputJson) {
-  // Map<keyName, object array>
+  // Map<length of keys in an object, object array>
   const map = new Map();
   iterateObjectToRemoveDuplicates(inputJson, map);
   return inputJson;
